@@ -21,10 +21,10 @@
   ./shef.sh -q "apache" > apache_ips.txt # Search for apache servers
 ```
 ```bash
-./shef.sh -q 'org:\"Google LLC\"' # Search with organization filter:
+./shef.sh -q 'org:\"Google LLC\"' # Search with organization filter
 ```
 ```bash
-./shef.sh -q "port:443" | sort -u # Search with port filter:
+./shef.sh -q "port:443" | sort -u # Search with port filter
 ```
 ```bash
 ./shef.sh -q "apache" | xargs -I {} nmap -sV {} # Scan found IPs with nmap
