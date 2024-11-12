@@ -10,13 +10,28 @@
 - Clean, pipe-friendly output
 - Zero dependencies (just bash & curl)
 
+
+<br>
+<br>
+
+`installation`
+> `oneliner`
+```bash
+git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && sudo mv shef.sh /bin/shef && cd .. && rm -rf shef
+```
+
+<br>
+<br>
+
 `arguments`
 <pre>
   -q   : Search query (required)
 </pre>
 
-`example commands`
+<br>
+<br>
 
+`example commands`
 ```bash
   ./shef.sh -q "apache" > apache_ips.txt # Search for apache servers
 ```
@@ -35,6 +50,9 @@
 ```bash
 ./shef.sh -q "apache" | grep -v "^10\." > public_ips.txt # Filter and process results
 ```
+
+<br>
+<br>
 
 `If you see no results`
 - Check your query syntax
