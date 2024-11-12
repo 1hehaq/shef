@@ -5,8 +5,7 @@
 `shef extracts IPs from Shodan searches. just the IPs you need.`
 
 
-- Extract IPs from Shodan searches
-- Multi-page support with API
+- Extract IPs from Shodan
 - Random User-Agent rotation
 - Clean, pipe-friendly output
 - Zero dependencies (just bash & curl)
@@ -14,8 +13,6 @@
 `arguments`
 <pre>
   -q   : Search query (required)
-  -p   : Number of pages (optional, default: 1)
-  -api : Shodan API key (optional, required for multiple pages)
 </pre>
 
 `example commands`
@@ -41,7 +38,6 @@
 
 `If you see no results`
 - Check your query syntax
-- Verify API key if using multiple pages
 - Ensure you have curl installed
 - Check your internet connection
 
