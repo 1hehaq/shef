@@ -33,22 +33,22 @@ git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && s
 
 `example commands`
 ```bash
-  ./shef.sh -q "apache" > apache_ips.txt # Search for apache servers
+shef -q "apache" > apache_ips.txt # Search for apache servers
 ```
 ```bash
-./shef.sh -q 'org:\"Google LLC\"' # Search with organization filter
+shef -q 'org:\"Google LLC\"' # Search with organization filter
 ```
 ```bash
-./shef.sh -q "port:443" | sort -u # Search with port filter
+shef -q "port:443" | sort -u # Search with port filter
 ```
 ```bash
-./shef.sh -q "apache" | xargs -I {} nmap -sV {} # Scan found IPs with nmap
+shef -q "apache" | xargs -I {} nmap -sV {} # Scan found IPs with nmap
 ```
 ```bash
-./shef.sh -q "apache" | tee ips.txt | wc -l # Save to file and count results
+shef -q "apache" | tee ips.txt | wc -l # Save to file and count results
 ```
 ```bash
-./shef.sh -q "apache" | grep -v "^10\." > public_ips.txt # Filter and process results
+shef -q "apache" | grep -v "^10\." > public_ips.txt # Filter and process results
 ```
 
 <br>
