@@ -1,4 +1,8 @@
-<h1 align="center">shef</h1>
+<div align="center">
+  
+  ![shef](https://github.com/user-attachments/assets/fe2ff3ed-953c-427e-a9ca-04c629e1d10d)
+
+</div>
 
 > shef is shef, that cook for you
 
