@@ -148,12 +148,8 @@ validate_query() {
     fi
 
     #check syntax errr
-    if [[ "$query" =~ [\[\]\{\}] ]]; then
-        issues+=("Found invalid characters: [] or {} are not supported in queries")
-    fi
-
-    if [[ "$query" =~ [[:punct:]] && "$query" =~ [^:\"\.] ]]; then
-        issues+=("Found invalid characters: Only :, \", and . are allowed as special characters")
+    if [[ "$query" =~ [^a-zA-Z0-9:\"\.\ \-_] ]]; then
+        issues+=("Found invalid characters: Only alphanumeric, :, \", ., -, _ and spaces are allowed")
     fi
 
     local quote_count
@@ -196,7 +192,7 @@ validate_query() {
 check_filter_syntax() {
     local filter="$1"
     local query="$2"
-    local -n issues=$3
+    local -n ref=$3
     local filter_value
     
     filter_value=$(echo "$query" | grep -oP "${filter}:\K([^\s\"]+|\"[^\"]+\")" | sed 's/^"\(.*\)"$/\1/')
@@ -204,34 +200,34 @@ check_filter_syntax() {
     case $filter in
         "port")
             if ! [[ "$filter_value" =~ ^[0-9]+$ ]]; then
-                issues+=("Invalid port number: '$filter_value' (should be numeric)")
+                ref+=("Invalid port number: '$filter_value' (should be numeric)")
             elif (( filter_value > 65535 )); then
-                issues+=("Invalid port number: '$filter_value' (should be between 1-65535)")
+                ref+=("Invalid port number: '$filter_value' (should be between 1-65535)")
             fi
             ;;
         "net")
             if ! [[ "$filter_value" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$ ]]; then
-                issues+=("Invalid network range: '$filter_value' (should be in CIDR notation, e.g., 192.168.0.0/16)")
+                ref+=("Invalid network range: '$filter_value' (should be in CIDR notation, e.g., 192.168.0.0/16)")
             fi
             ;;
         "before"|"after")
             if ! [[ "$filter_value" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-                issues+=("Invalid date format: '$filter_value' (should be YYYY-MM-DD)")
+                ref+=("Invalid date format: '$filter_value' (should be YYYY-MM-DD)")
             fi
             ;;
         "country")
             if ! [[ "$filter_value" =~ ^[A-Za-z]{2}$ ]]; then
-                issues+=("Invalid country code: '$filter_value' (should be 2-letter code, e.g., US)")
+                ref+=("Invalid country code: '$filter_value' (should be 2-letter code, e.g., US)")
             fi
             ;;
         "ssl")
             if ! [[ "$filter_value" =~ ^(true|false)$ ]]; then
-                issues+=("Invalid ssl value: '$filter_value' (should be true or false)")
+                ref+=("Invalid ssl value: '$filter_value' (should be true or false)")
             fi
             ;;
         "http.status")
             if ! [[ "$filter_value" =~ ^[1-5][0-9]{2}$ ]]; then
-                issues+=("Invalid HTTP status code: '$filter_value' (should be between 100-599)")
+                ref+=("Invalid HTTP status code: '$filter_value' (should be between 100-599)")
             fi
             ;;
     esac
