@@ -4,12 +4,13 @@
 
 </div>
 
-> shef is shef, that cook for you
+> [!NOTE] 
+> **shef extracts data from Shodan searches without API key. just what you need**
 
-`shef extracts IPs from Shodan searches. just the IPs you need.`
+<br>
 
-
-- Extract IPs from Shodan
+- Extract IPs, domains, and vulnerabilities
+- Multiple facet support (ip, domain, port, vuln, http.*)
 - Random User-Agent rotation
 - Clean, pipe-friendly output
 - Zero dependencies (just bash & curl)
@@ -29,7 +30,10 @@ git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && s
 
 `arguments`
 <pre>
-  -q   : Search query (required)
+  -q    : Search query (required)
+  -f    : Facet type (default: ip)
+  -l    : Limit results (default: 100)
+  -h    : Show help message
 </pre>
 
 <br>
@@ -37,32 +41,42 @@ git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && s
 
 `example commands`
 ```bash
-shef -q "apache" > apache_ips.txt # Search for apache servers
+# Get IPs running Apache
+shef -q "apache" > apache_ips.txt
+
+# Find subdomains of an organization
+shef -q 'org:"Google LLC"' -f domain
+
+# Get open ports of a product
+shef -q "product:nginx" -f port
+
+# Extract web technologies
+shef -q "wordpress" -f http.component
+
+# Find vulnerabilities
+shef -q "product:jboss" -f vuln
 ```
+
+`masshunting oneliner`
 ```bash
-shef -q 'org:\"Google LLC\"' # Search with organization filter
-```
-```bash
-shef -q "port:443" | sort -u # Search with port filter
-```
-```bash
-shef -q "apache" | xargs -I {} nmap -sV {} # Scan found IPs with nmap
-```
-```bash
-shef -q "apache" | tee ips.txt | wc -l # Save to file and count results
-```
-```bash
-shef -q "apache" | grep -v "^10\." > public_ips.txt # Filter and process results
+# Hunt for vulnerable services and verify
+shef -q "product:apache" -f vuln | grep "CVE" | while read cve; do echo "[+] Checking $cve"; shef -q "vuln:$cve" -f ip | anew ips.txt | httpx -silent | nuclei -t cves/ -severity critical,high; done
 ```
 
 <br>
 <br>
 
-`If you see no results`
-- Check your query syntax
+`If you see no results or errors`
+- Check your query syntax (use -h for help)
 - Ensure you have curl installed
 - Check your internet connection
+- Note: Wildcard searches are not supported
 
+<br>
+<br>
+
+> [!CAUTION] 
+> **shef is not a tool for masshunting, it's a tool for extracting data from Shodan searches without API key.**
 
 <br>
 <br>
