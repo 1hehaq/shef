@@ -5,21 +5,20 @@
 </div>
 
 > [!NOTE] 
-> **shef extracts data from Shodan searches without API key. just what you need**
+> **shef is a powerful tool for extracting data from Shodan searches without requiring an API key. It provides exactly what you need for efficient data retrieval.**
 
 <br>
 
-- Extract IPs, domains, and vulnerabilities
-- Multiple facet support (ip, domain, port, vuln, http.*)
-- Random User-Agent rotation
-- Clean, pipe-friendly output
-- Zero dependencies (just bash & curl)
-
+- **`Extract IP addresses, domain names, and known vulnerabilities with ease`**
+- **`Supports multiple facets including IP, domain, port, vulnerability, and HTTP components`**
+- **`Utilizes random User-Agent rotation to mimic diverse browsing behavior`**
+- **`Produces clean, pipe-friendly output suitable for further processing`**
+- **`Requires minimal dependencies (only bash and curl)`**
 
 <br>
 <br>
 
-`installation`
+**_Installation_**
 > `oneliner`
 ```bash
 git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && sudo mv shef.sh /bin/shef && cd .. && rm -rf shef
@@ -28,7 +27,7 @@ git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && s
 <br>
 <br>
 
-`arguments`
+**_Arguments_**
 <pre>
   -q    : Search query (required)
   -f    : Facet type (default: ip)
@@ -39,50 +38,47 @@ git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && s
 <br>
 <br>
 
-`example commands`
+**_Example Commands_**
 ```bash
-# Get IPs running Apache
+# Retrieve IP addresses associated with Apache servers
 shef -q "apache" > apache_ips.txt
 
-# Find subdomains of an organization
+# Discover subdomains related to a specific organization
 shef -q 'org:"Google LLC"' -f domain
 
-# Get open ports of a product
+# Identify open ports for a particular product
 shef -q "product:nginx" -f port
 
-# Extract web technologies
+# Extract web technologies in use
 shef -q "wordpress" -f http.component
 
-# Find vulnerabilities
+# Find known vulnerabilities for a product
 shef -q "product:jboss" -f vuln
 ```
 
-`masshunting oneliner`
-```bash
-# Hunt for vulnerable services and verify
-shef -q "product:apache" -f vuln | grep "CVE" | while read cve; do echo "[+] Checking $cve"; shef -q "vuln:$cve" -f ip | anew ips.txt | httpx -silent | nuclei -t cves/ -severity critical,high; done
-```
-
 <br>
 <br>
 
-`If you see no results or errors`
-- Check your query syntax (use -h for help)
-- Ensure you have curl installed
-- Check your internet connection
-- Note: Wildcard searches are not supported
+- **_If you see no results or errors_**
+  - **`Verify the syntax of your query (use -h for guidance)`**
+  - **`Ensure that curl is installed on your system`**
+  - **`Check your internet connection for stability`**
+  - **`Note: Wildcard searches are not supported`**
 
 <br>
 <br>
 
 > [!CAUTION] 
-> **shef is not a tool for masshunting, it's a tool for extracting data from Shodan searches without API key.**
+> **shef is designed for responsible use in extracting data from Shodan searches without an API key. Please use it ethically.**
 
 <br>
 <br>
 <br>
-<p align="center">
-Made with <3 by <a href="https://github.com/1hehaq" >@1hehaq</a>
-<br>
-Follow me on <a href="https://twitter.com/1hehaq">𝕏</a>
+
+<div align="center">
+<p>
+
+Follow me on <a href="https://twitter.com/1hehaq">`𝕏`</a>
+
 </p>
+</div>
