@@ -115,8 +115,8 @@ validate_query() {
         query="${query%\"}\""
     fi
 
-    query=$(echo "$query" | sed 's/[\&\|\!\(\)\{\}\[\]\^\~\*\?\:\\]/\\&/g')
-    # echo -e "${GREEN}Fixed query: $query${NC}" >&2
+    # query=$(echo "$query" | sed 's/[\&\|\!\(\)\{\}\[\]\^\~\*\?\:\\]/\\&/g')
+    echo -e "${GREEN}Fixed query: $query${NC}" >&2
 }
 
 check_response() {
