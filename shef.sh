@@ -97,7 +97,8 @@ validate_query() {
         error_exit "empty query provided"
     fi
 
-    if [[ ! "$query" =~ ^[a-zA-Z0-9:\"\ \.\-\_]+$ ]]; then
+    if [[ ! "$query" =~ ^[a-zA-Z0-9:\"\ \.\-\_\&\|\!\(\)\{\}\[\]\^\~\*\?\:\\]+$ ]]; then
+    # if [[ ! "$query" =~ ^[a-zA-Z0-9:\"\ \.\-\_]+$ ]]; then
         echo -e "${RED}error: invalid characters found in query${NC}" >&2
         exit 1
     fi
