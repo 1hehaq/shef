@@ -78,7 +78,7 @@ shef -q "product:jboss" -f vuln
 <div align="center">
 <p>
 
-Follow me on <a href="https://twitter.com/1hehaq">`𝕏`</a>
+<a href="https://x.com/1hehaq">**`Follow me on`**</a> - `𝕏`
 
 </p>
 </div>
