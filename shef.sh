@@ -49,6 +49,8 @@ usage() {
     echo "  -q    Query string (required)"
     echo "  -f    Facet type (default: ip)"
     echo "  -l    Limit results (default: 100)"
+    echo "  -j    Output in JSON format"
+    echo "  -v    Verbose output"
     echo "  -h    Show this help message"
     echo
     echo "Available facets:"
@@ -97,14 +99,9 @@ validate_query() {
         error_exit "empty query provided"
     fi
 
-    if [[ ! "$query" =~ ^[a-zA-Z0-9:\"\ \.\-\_\&\|\!\(\)\{\}\[\]\^\~\*\?\:\\]+$ ]]; then
-    # if [[ ! "$query" =~ ^[a-zA-Z0-9:\"\ \.\-\_]+$ ]]; then
-        echo -e "${RED}error: invalid characters found in query${NC}" >&2
-        exit 1
-    fi
-
-    if [[ "$query" =~ facet: ]]; then
-        echo -e "${RED}error: use -f option to specify facet${NC}" >&2
+    if [[ "$query" =~ [^a-zA-Z0-9:\"\.\ \-_] ]]; then
+        local character=$(echo "$query" | grep -oP '[^a-zA-Z0-9:\"\.\ \-_]' | head -n 1)
+        echo -e "${RED}Error: invalid character ${WHITE}${character}${RED} in query${NC}" >&2
         exit 1
     fi
 
@@ -114,9 +111,6 @@ validate_query() {
         echo -e "${YELLOW}Warning:${NC} unmatched quotes detected. attempting to fix..." >&2
         query="${query%\"}\""
     fi
-
-    # query=$(echo "$query" | sed 's/[\&\|\!\(\)\{\}\[\]\^\~\*\?\:\\]/\\&/g')
-    echo -e "${GREEN}Fixed query: $query${NC}" >&2
 }
 
 check_response() {
@@ -138,6 +132,10 @@ check_response() {
     if echo "$response" | grep -q "no results found"; then
         echo "Note: no results found"
         exit 0
+    fi
+
+    if echo "$response" | grep -q "Cloudflare"; then
+        error_exit "Error: request blocked by Cloudflare; this may be due to using VPN. try again without VPN or change your IP!"
     fi
 }
 
@@ -173,15 +171,23 @@ main() {
     local query=""
     local facet="ip"
     local limit=100
+    local json_output=false
+    local verbose=false
 
     # parse cmd
-    while getopts "q:f:l:h" opt; do
+    while getopts "q:f:l:Fjvh" opt; do
         case $opt in
             q) query="$OPTARG" ;;
             f) facet="$OPTARG" 
                validate_facet "$facet" ;;
             l) limit="$OPTARG"
                [[ ! "$limit" =~ ^[0-9]+$ ]] && error_exit "limit must be a number" ;;
+            F) for f in "${!FACETS[@]}"; do
+                  echo -e "${YELLOW}$f${NC}: ${FACETS[$f]}"
+               done
+               exit 0 ;;
+            j) json_output=true ;;
+            v) verbose=true ;;
             h) usage ;;
             # help) usage ;;
             *) usage ;;
@@ -190,29 +196,54 @@ main() {
 
     [[ -z "$query" ]] && error_exit "query parameter (-q) is required"
     
-    validate_query "$query" "$facet"
+    # validate_query "$query" "$facet"
 
     local UA=${USER_AGENTS[$RANDOM % ${#USER_AGENTS[@]}]}
+    
     local url
     url=$(parse_url "$query" "$facet" "$limit")
 
     #verbose mode
     [[ $verbose == true ]] && echo -e "${GREEN}Querying: $url${NC}" >&2
 
-    local html
-    html=$(curl -s -A "$UA" \
+    local response
+    response=$(curl -s -A "$UA" \
         -H "Accept: text/html,application/xhtml+xml" \
         -H "Accept-Language: en-US,en;q=0.9" \
-        --compressed "$url") || error_exit "failed to fetch data from Shodan"
+        --compressed "$url") || error_exit "Failed to fetch data from shodan"
 
-    check_response "$html"
+    check_response "$response"
 
-    local results=$(extract_facets "$html" "$facet")
-    if [[ -n "$results" ]]; then
-        echo "$results"
-    else
-        echo "no $facet found" >&2
-    fi
+    case $facet in
+        "ip")
+            if [[ $json_output == true ]]; then
+                if [[ -n "$response" ]]; then
+                    echo "$response" | jq -r '.[] | select(.ip != null) | .ip' 2>/dev/null || echo "No valid IP addresses found"
+                else
+                    echo "no results found"
+                fi
+            else
+                if [[ -n "$response" ]]; then
+                    echo "$response" | \
+                    grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | \
+                    grep -v '^0\.\|^127\.\|^169\.254\.\|^172\.\(1[6-9]\|2[0-9]\|3[0-1]\)\.\|^192\.168\.\|^10\.\|^224\.\|^240\.\|^281\.\|^292\.' | \
+                    sort -u || echo "no valid IPs found"
+                else
+                    echo "no results found"
+                fi
+            fi
+            ;;
+        "vuln")
+            echo "$response" | grep -o 'CVE-[0-9]\{4\}-[0-9]\{4,\}' | sort -u
+            ;;
+        *)
+            if [[ $json_output == true ]]; then
+                echo "$response"
+            else
+                echo "$response" | grep -o "[^[:space:]]\+\.$facet[^[:space:]]\+" | sort -u
+            fi
+            ;;
+    esac
 }
 
 main "$@"
