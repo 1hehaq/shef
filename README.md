@@ -5,7 +5,7 @@
 </div>
 
 > [!NOTE] 
-> **shef is a powerful tool for extracting data from Shodan searches without requiring an API key. It provides exactly what you need for efficient data retrieval.**
+> **shef is a simple tool for extracting data from Shodan searches without requiring an API key. It provides exactly what you need for efficient data retrieval.**
 
 <br>
 
