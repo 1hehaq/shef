@@ -9,11 +9,11 @@
 
 <br>
 
-- **`Extract IP addresses, domain names, and known vulnerabilities with ease`**
-- **`Supports multiple facets including IP, domain, port, vulnerability, and HTTP components`**
-- **`Utilizes random User-Agent rotation to mimic diverse browsing behavior`**
-- **`Produces clean, pipe-friendly output suitable for further processing`**
-- **`Requires minimal dependencies (only bash and curl)`**
+- <sub>**Extract IP addresses, domain names, and known vulnerabilities with ease**</sub>
+- <sub>**Supports multiple facets including IP, domain, port, vulnerability, and HTTP components**</sub>
+- <sub>**Utilizes random User-Agent rotation to mimic diverse browsing behavior**</sub>
+- <sub>**Produces clean, pipe-friendly output suitable for further processing**</sub>
+- <sub>**Requires minimal dependencies (only bash and curl)**</sub>
 
 <br>
 <br>
@@ -60,10 +60,10 @@ shef -q "product:jboss" -f vuln
 <br>
 
 - **_If you see no results or errors_**
-  - **`Verify the syntax of your query (use -h for guidance)`**
-  - **`Ensure that curl is installed on your system`**
-  - **`Check your internet connection for stability`**
-  - **`Note: Wildcard searches are not supported`**
+  - <sub>**Verify the syntax of your query (use -h for guidance)**</sub>
+  - <sub>**Ensure that curl is installed on your system**</sub>
+  - <sub>**Check your internet connection for stability**</sub>
+  - <sub>**Note: Wildcard searches are not supported**</sub>
 
 <br>
 <br>
