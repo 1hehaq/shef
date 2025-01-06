@@ -135,7 +135,7 @@ check_response() {
     fi
 
     if echo "$response" | grep -q "Cloudflare"; then
-        error_exit "Error: request blocked by Cloudflare; this may be due to using VPN. try again without VPN or change your IP!"
+        error_exit "request blocked by Cloudflare; this may be due to using VPN. try again without VPN or change your IP!"
     fi
 }
 
