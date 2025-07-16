@@ -1,84 +1,109 @@
 <div align="center">
-  
-  ![shef](https://github.com/user-attachments/assets/fe2ff3ed-953c-427e-a9ca-04c629e1d10d)
-
+  <img src="https://github.com/user-attachments/assets/e87dd5b5-3135-4fed-8a9f-dc75671b85a6" alt="shef" width="955">
 </div>
 
+<br>
+<br>
+<br>
+
+
 > [!NOTE] 
-> **shef is a simple tool for extracting data from Shodan searches without requiring an API key. It provides exactly what you need for efficient data retrieval.**
+> **shef is a minimal tool for bringing facets into your terminal without any API key.**
 
 <br>
 
-- <sub>**Extract IP addresses, domain names, and known vulnerabilities with ease**</sub>
-- <sub>**Supports multiple facets including IP, domain, port, vulnerability, and HTTP components**</sub>
-- <sub>**Utilizes random User-Agent rotation to mimic diverse browsing behavior**</sub>
-- <sub>**Produces clean, pipe-friendly output suitable for further processing**</sub>
-- <sub>**Requires minimal dependencies (only bash and curl)**</sub>
+- <sub> **supports All kind of shodan query (those which only supported on [facet](https://www.shodan.io/search/facet))** </sub>
+- <sub> **extracts multiple [facets](https://www.shodan.io/search/facet) (Use `-list` flag to see all facet types)** </sub>
+- <sub> **rotates random User-Agent** </sub>
+- <sub> **clean and pipe friendly output** </sub>
 
 <br>
 <br>
 
-**_Installation_**
-> `oneliner`
+<h4>Installation</h4>
+
 ```bash
-git clone https://github.com/1hehaq/shef.git && cd shef && chmod +x shef.sh && sudo mv shef.sh /bin/shef && cd .. && rm -rf shef
+go install github.com/1hehaq/shef@latest
 ```
 
 <br>
 <br>
 
-**_Arguments_**
+<h4>Flags</h4>
+
 <pre>
-  -q    : Search query (required)
-  -f    : Facet type (default: ip)
-  -l    : Limit results (default: 100)
-  -h    : Show help message
+  -q    : search query (required)
+  -f    : facet type (default: ip)
+  -list : list all facet types
+  -json : stdout in JSON format
+  -h    : show help message
 </pre>
 
 <br>
 <br>
 
-**_Example Commands_**
+<h4>Example Commands</h4>
+
 ```bash
-# Retrieve IP addresses associated with Apache servers
-shef -q "apache" > apache_ips.txt
+# get specific target's IPs and take web screenshots then view the images in terminal
+shef -q org:tesla -f ip | sed 's/^/http:\/\//' | klik && yazi screenshots
+```
+[`klik`](https://github.com/1hehaq/hacks/blob/main/klik/main.go) [`yazi`](https://github.com/sxyazi/yazi)
 
-# Discover subdomains related to a specific organization
-shef -q 'org:"Google LLC"' -f domain
+<br>
 
-# Identify open ports for a particular product
-shef -q "product:nginx" -f port
+```bash
+# get related/own domains of the query, sometime it exposes internal portals (they shouldn't be same root domain)
+shef -q hackerone.com -f domain # chain it with amass for getting more wide attack surfaces
 
-# Extract web technologies in use
-shef -q "wordpress" -f http.component
+# same for ports
+shef -q hackerone.com -f port
+```
 
-# Find known vulnerabilities for a product
+<br>
+
+```bash
+# gets asn number(s) of the query then asn lookup with asnmap
+asnmap -asn $(shef -q hackerone.com -f asn) # loop it if multiple asn numbers gets as shef's result
+```
+[`asnmap`](https://github.com/projectdiscovery/asnmap)
+
+<br>
+
+```bash
+# gets relative domains and probe {title, IP, status code} then filter non 403 only (sometime, it shows real IPs, non WAF areas)
+shef -q hackerone -f domain | httpx -sc -ip -title -silent | grep -vE '403|Cloudflare|Access Denied|Not Allowed'
+```
+[`httpx`](https://github.com/projectdiscovery/httpx)
+
+<br>
+
+```bash
+# find known vulnerabilities of a product
 shef -q "product:jboss" -f vuln
 ```
 
 <br>
 <br>
 
-- **_If you see no results or errors_**
-  - <sub>**Verify the syntax of your query (use -h for guidance)**</sub>
-  - <sub>**Ensure that curl is installed on your system**</sub>
-  - <sub>**Check your internet connection for stability**</sub>
-  - <sub>**Note: Wildcard searches are not supported**</sub>
+- **If you see no results or errors**
+  - <sub> **verfiy your query** </sub>
+  - <sub> **check your internet connection** </sub>
+  - <sub> **use `-h` for guidance** </sub>
 
 <br>
 <br>
 
 > [!CAUTION] 
-> **shef is designed for responsible use in extracting data from Shodan searches without an API key. Please use it ethically.**
+> **never use `shef` for any illegal activites, I'm not responsible for your deeds with it. Do for justice.**
 
 <br>
 <br>
 <br>
+
+<h6 align="center">kindly for hackers</h6>
 
 <div align="center">
-<p>
-
-<a href="https://x.com/1hehaq">**`Follow me on`**</a> - `𝕏`
-
-</p>
+  <a href="https://github.com/1hehaq"><img src="https://img.icons8.com/material-outlined/20/808080/github.png" alt="GitHub"></a>
+  <a href="https://twitter.com/1hehaq"><img src="https://img.icons8.com/material-outlined/20/808080/twitter.png" alt="X"></a>
 </div>
