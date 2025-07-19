@@ -28,10 +28,10 @@ go install github.com/1hehaq/shef@latest
 
 <br>
 
-<h6>setup autocomletion for facets & flags</h6>
+<h6>setup autocomletion for facet names</h6>
 
 ```bash
-wget https://raw.githubusercontent.com/1hehaq/shef/refs/heads/main/install.sh && sudo bash install.sh && rm install.sh
+echo -e "complete -W '\$(shef -list)' shef" >> ~/.bashrc && source ~/.bashrc
 ```
 
 - <sub>**then try this**</sub>
