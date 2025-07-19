@@ -48,7 +48,12 @@ func main() {
 		}
 	}()
 
-	query, facet, jsonOutput, listFacets := parseFlags()
+	query, facet, jsonOutput, listFacets, showHelp := parseFlags()
+	
+	if showHelp {
+		displayHelp()
+		return
+	}
 	
 	if listFacets {
 		displayFacets()
@@ -69,24 +74,47 @@ func main() {
 	}
 }
 
-func parseFlags() (string, string, bool, bool) {
+func parseFlags() (string, string, bool, bool, bool) {
 	query := flag.String("q", "", "search query (required)")
 	facet := flag.String("f", "ip", "facet type (use -list flag)")
 	jsonOutput := flag.Bool("json", false, "stdout in JSON format")
 	listFacets := flag.Bool("list", false, "list all facets")
+	showHelp := flag.Bool("h", false, "show help")
 	flag.Parse()
 
+	if *showHelp {
+		return "", "", false, false, true
+	}
+
 	if *listFacets {
-		return "", "", false, true
+		return "", "", false, true, false
 	}
 
 	if *query == "" {
-		log.Error("search query is required!")
+		displayHelp()
 		os.Exit(0)
 	}
 
-	return *query, *facet, *jsonOutput, false
+	return *query, *facet, *jsonOutput, false, false
 }
+
+func displayHelp() {
+	fmt.Printf("\n")	
+	fmt.Printf(" \033[32mexample:\033[0m\n")
+	fmt.Printf("    \033[36mshef\033[0m -q \033[2mnginx\033[0m -f \033[2mproduct\033[0m\n")
+	fmt.Printf("    \033[36mshef\033[0m -q \033[2mapache\033[0m -json\n\n")
+	
+	fmt.Printf(" \033[32moptions:\033[0m\n")
+	fmt.Printf("    \033[37m-q\033[0m      search query \033[31m(required)\033[0m\n")
+	fmt.Printf("    \033[37m-f\033[0m      facet type \033[2m(default: ip)\033[0m\n")
+	fmt.Printf("    \033[37m-json\033[0m   stdout as JSON format\n")
+	fmt.Printf("    \033[37m-list\033[0m   list all facets\n")
+	fmt.Printf("    \033[37m-h\033[0m      show this help message\n\n")
+
+	fmt.Printf("\033[2musage of shodan for attacking targets without prior mutual consent is illegal!\033[0m\n\n")
+}
+
+
 
 func displayFacets() {
 	for _, facet := range shodanFacets {
