@@ -56,6 +56,10 @@ wget https://raw.githubusercontent.com/1hehaq/shef/refs/heads/main/install.sh &&
   -h    : show help message
 </pre>
 
+<div align="center">
+  <img width="3650" height="1838" alt="help" src="https://github.com/user-attachments/assets/c44839a6-f8ad-40dd-bb66-36a1b5423fd4" />
+</div>
+
 <br>
 <br>
 
