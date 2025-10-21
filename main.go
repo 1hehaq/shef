@@ -18,7 +18,7 @@ import (
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
-const version = "2.2.0"
+const version = "2.2.1"
 
 var shodanFacets = []string{
 	"asn", "bitcoin.ip", "bitcoin.ip_count", "bitcoin.port", "bitcoin.user_agent",
