@@ -11,9 +11,14 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/blang/semver"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/corpix/uarand"
+	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
+
+const version = "2.2.0"
 
 var shodanFacets = []string{
 	"asn", "bitcoin.ip", "bitcoin.ip_count", "bitcoin.port", "bitcoin.user_agent",
@@ -80,7 +85,19 @@ func parseFlags() (string, string, bool, bool, bool) {
 	jsonOutput := flag.Bool("json", false, "stdout in JSON format")
 	listFacets := flag.Bool("list", false, "list all facets")
 	showHelp := flag.Bool("h", false, "show help")
+	showVersion := flag.Bool("v", false, "show version")
+	update := flag.Bool("up", false, "update to latest version")
 	flag.Parse()
+
+	if *showVersion {
+		displayVersion()
+		os.Exit(0)
+	}
+
+	if *update {
+		performUpdate()
+		os.Exit(0)
+	}
 
 	if *showHelp {
 		return "", "", false, false, true
@@ -99,19 +116,97 @@ func parseFlags() (string, string, bool, bool, bool) {
 }
 
 func displayHelp() {
-	fmt.Printf("\n")	
-	fmt.Printf(" \033[32mexample:\033[0m\n")
-	fmt.Printf("    \033[36mshef\033[0m -q \033[2mnginx\033[0m -f \033[2mproduct\033[0m\n")
-	fmt.Printf("    \033[36mshef\033[0m -q \033[2mapache\033[0m -json\n\n")
+	cmdStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("14"))
+	argStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	flagStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("15"))
+	requiredStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+	successStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
 	
-	fmt.Printf(" \033[32moptions:\033[0m\n")
-	fmt.Printf("    \033[37m-q\033[0m      search query \033[31m(required)\033[0m\n")
-	fmt.Printf("    \033[37m-f\033[0m      facet type \033[2m(default: ip)\033[0m\n")
-	fmt.Printf("    \033[37m-json\033[0m   stdout as JSON format\n")
-	fmt.Printf("    \033[37m-list\033[0m   list all facets\n")
-	fmt.Printf("    \033[37m-h\033[0m      show this help message\n\n")
+	fmt.Println()
+	fmt.Println(successStyle.Render(" example:"))
+	fmt.Printf("    %s -q %s -f %s\n", cmdStyle.Render("shef"), argStyle.Render("hackerone.com"), argStyle.Render("ports"))
+	fmt.Printf("    %s -q %s -json\n\n", cmdStyle.Render("shef"), argStyle.Render("apache"))
+	
+	fmt.Println(successStyle.Render(" options:"))
+	fmt.Printf("    %s      search query %s\n", flagStyle.Render("-q"), requiredStyle.Render("(required)"))
+	fmt.Printf("    %s      facet type %s\n", flagStyle.Render("-f"), argStyle.Render("(default: ip)"))
+	fmt.Printf("    %s   stdout as JSON format\n", flagStyle.Render("-json"))
+	fmt.Printf("    %s   list all facets\n", flagStyle.Render("-list"))
+	fmt.Printf("    %s      show version\n", flagStyle.Render("-v"))
+	fmt.Printf("    %s     update to latest version\n", flagStyle.Render("-up"))
+	fmt.Printf("    %s      show this help message\n\n", flagStyle.Render("-h"))
+	
+	fmt.Println(argStyle.Render("usage of shodan for attacking targets without prior mutual consent is illegal!"))
+	fmt.Println()
+}
 
-	fmt.Printf("\033[2musage of shodan for attacking targets without prior mutual consent is illegal!\033[0m\n\n")
+func displayVersion() {
+	highlightStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("14"))
+	dimStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	
+	fmt.Println()
+	fmt.Printf("%s %s\n", highlightStyle.Render("shef"), dimStyle.Render("v"+version))
+	fmt.Println()
+}
+
+func performUpdate() {
+	highlightStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("14"))
+	errorStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("9")).Bold(true)
+	successStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)
+	dimStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	
+	fmt.Println()
+	fmt.Println(highlightStyle.Render("checking for updates..."))
+	
+	latest, found, err := selfupdate.DetectLatest("1hehaq/shef")
+	if err != nil {
+		fmt.Printf("%s %s\n", errorStyle.Render("✗"), dimStyle.Render("error checking for updates: "+err.Error()))
+		fmt.Println()
+		os.Exit(1)
+	}
+	
+	if !found {
+		fmt.Printf("%s %s\n", errorStyle.Render("✗"), dimStyle.Render("no releases found"))
+		fmt.Println()
+		os.Exit(1)
+	}
+	
+	currentVersion := "v" + version
+	v, err := semver.ParseTolerant(strings.TrimPrefix(currentVersion, "v"))
+	if err != nil {
+		fmt.Printf("%s %s\n", errorStyle.Render("✗"), dimStyle.Render("invalid version format: "+err.Error()))
+		fmt.Println()
+		os.Exit(1)
+	}
+	
+	if !latest.Version.GT(v) {
+		fmt.Printf("%s %s\n", successStyle.Render("✓"), dimStyle.Render("already up to date ("+currentVersion+")"))
+		fmt.Println()
+		return
+	}
+	
+	exe, err := os.Executable()
+	if err != nil {
+		fmt.Printf("%s %s\n", errorStyle.Render("✗"), dimStyle.Render("could not locate executable: "+err.Error()))
+		fmt.Println()
+		os.Exit(1)
+	}
+	
+	fmt.Printf("  %s → %s\n", dimStyle.Render(currentVersion), highlightStyle.Render(latest.Version.String()))
+	fmt.Println()
+	fmt.Print(dimStyle.Render("  updating... "))
+	
+	if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
+		fmt.Printf("%s\n", errorStyle.Render("failed"))
+		fmt.Printf("  %s\n", dimStyle.Render("error: "+err.Error()))
+		fmt.Println()
+		os.Exit(1)
+	}
+	
+	fmt.Printf("%s\n", successStyle.Render("done"))
+	fmt.Println()
+	fmt.Println(dimStyle.Render("  restart shef to use the new version"))
+	fmt.Println()
 }
 
 
